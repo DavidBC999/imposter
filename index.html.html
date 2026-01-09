@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Imposter Game</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Reset & Variables */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1e2e 50%, #111827 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #8b5cf6;
+            --accent: #ec4899;
+            --text: #f3f4f6;
+            --text-muted: #9ca3af;
+            --danger: #ef4444;
+            --success: #10b981;
+            --input-bg: rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            /* Remove mobile touch blue box */
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            /* Handle iOS Safari 100vh */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            padding: 1rem;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            min-height: 500px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        @media (max-width: 380px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem !important;
+            }
+        }
+
+        /* Typography */
+        h1,
+        h2 {
+            text-align: center;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #c084fc, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--text);
+            margin-top: 0.5rem;
+        }
+
+        p {
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        /* Inputs & Buttons */
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            flex: 1;
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            padding: 0.875rem 1rem;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            /* Prevent iOS auto-zoom on focus */
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: var(--primary);
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform 0.1s, opacity 0.2s, box-shadow 0.2s;
+            width: 100%;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        button:last-child {
+            margin-bottom: 0;
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-icon {
+            width: auto;
+            aspect-ratio: 1;
+            padding: 0.75rem;
+            font-size: 1.25rem;
+            margin-bottom: 0;
+        }
+
+        /* Menu Buttons */
+        .menu-btn {
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.08);
+            text-align: left;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Player List */
+        .player-list-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 0.5rem;
+            max-height: 250px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .player-list {
+            list-style: none;
+        }
+
+        .player-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Settings UI */
+        .settings-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+
+        .settings-label {
+            display: block;
+            margin-bottom: 0.75rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .toggle-group {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .toggle-option {
+            flex: 1;
+            text-align: center;
+            padding: 0.6rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .toggle-option.active {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Switch Toggle */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--primary);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            flex-direction: column;
+            min-height: 400px;
+        }
+
+        .screen.active {
+            display: flex;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .screen-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem 0;
+            width: 100%;
+        }
+
+        /* Reveal Card */
+        .reveal-card {
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.2) 100%);
+            width: 100%;
+            padding: 3rem 1.5rem;
+            border-radius: 20px;
+            text-align: center;
+            margin: 1rem 0;
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .reveal-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .role-text {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 1rem 0;
+            letter-spacing: 2px;
+        }
+
+        .imposter-text {
+            color: var(--danger);
+            text-transform: uppercase;
+        }
+
+        .safe-text {
+            color: var(--success);
+        }
+
+        .word-reveal {
+            font-size: 2rem;
+            color: white;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .result-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            width: 100%;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .pop-in {
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- HOME SCREEN -->
+        <div id="home-screen" class="screen active">
+            <h1 style="margin-top: 1rem;">Imposter</h1>
+            <p>Find the spy among us.</p>
+
+            <div class="screen-content" style="justify-content: flex-start; padding-top: 1rem;">
+                <button class="btn-primary menu-btn" onclick="showScreen('start-game-check')">
+                    <span>🎮 Play Game</span>
+                    <span>→</span>
+                </button>
+
+                <button class="btn-secondary menu-btn" onclick="showScreen('player-setup-screen')">
+                    <span>👥 Manage Players</span>
+                    <span id="player-count-badge"
+                        style="background:var(--primary); padding: 2px 8px; border-radius: 10px; font-size: 0.8rem;">0</span>
+                </button>
+
+                <button class="btn-secondary menu-btn" onclick="showScreen('settings-screen')">
+                    <span>⚙️ Game Settings</span>
+                    <span>→</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- PLAYER SETUP SCREEN -->
+        <div id="player-setup-screen" class="screen">
+            <h2>Add Players</h2>
+            <p>At least 3 players needed.</p>
+
+            <div class="input-group">
+                <input type="text" id="player-input" placeholder="Name..." autocomplete="off">
+                <button class="btn-primary btn-icon" onclick="addPlayer()">+</button>
+            </div>
+
+            <div class="player-list-container">
+                <ul id="player-list" class="player-list"></ul>
+                <div id="empty-msg"
+                    style="text-align:center; padding: 2rem; color: var(--text-muted); font-size: 0.9rem;">
+                    No players added yet
+                </div>
+            </div>
+
+            <button class="btn-secondary" onclick="showScreen('home-screen')">Back to Home</button>
+        </div>
+
+        <!-- SETTINGS SCREEN -->
+        <div id="settings-screen" class="screen">
+            <h2>Game Settings</h2>
+
+            <div class="screen-content" style="justify-content: flex-start;">
+                <div class="settings-section">
+                    <span class="settings-label">Imposter Count</span>
+                    <div class="toggle-group">
+                        <div id="mode-fixed" class="toggle-option active" onclick="setImposterMode('fixed')">Fixed</div>
+                        <div id="mode-random" class="toggle-option" onclick="setImposterMode('random')">Random</div>
+                    </div>
+
+                    <div id="fixed-inputs">
+                        <div style="display:flex; align-items:center; justify-content:space-between;">
+                            <label>Count:</label>
+                            <input type="number" id="fixed-count" value="1" min="1" max="10" style="max-width: 80px;">
+                        </div>
+                    </div>
+
+                    <div id="random-inputs" class="hidden">
+                        <div
+                            style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 0.5rem;">
+                            <label>Min:</label>
+                            <input type="number" id="rand-min" value="1" min="1" max="10" style="max-width: 80px;">
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between;">
+                            <label>Max:</label>
+                            <input type="number" id="rand-max" value="2" min="1" max="10" style="max-width: 80px;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                        <span style="font-weight: 600;">Show Hint Word</span>
+                        <label class="switch">
+                            <input type="checkbox" id="hint-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <p style="text-align: left; font-size: 0.75rem; margin: 0.5rem 0 0 0;">Imposters see the category
+                        name.</p>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="saveSettings()">Save & Back</button>
+        </div>
+
+        <!-- PASS PHONE SCREEN -->
+        <div id="pass-screen" class="screen">
+            <h2>Pass the Phone</h2>
+            <div class="screen-content">
+                <div style="font-size: 4rem; margin-bottom: 1.5rem; animation: float 3s ease-in-out infinite;">📱</div>
+                <p>Pass the device to</p>
+                <h1 id="next-player-name" style="color: var(--primary);">Player</h1>
+            </div>
+            <button class="btn-primary" onclick="showReveal()">I am <span id="confirm-name">...</span></button>
+        </div>
+
+        <!-- REVEAL SCREEN -->
+        <div id="reveal-screen" class="screen">
+            <h2>Your Role</h2>
+            <div class="screen-content">
+                <div id="reveal-card" class="reveal-card" onclick="revealRole()">
+                    <div id="card-hidden">
+                        <span class="reveal-icon">🔒</span>
+                        <h3>Tap to Reveal</h3>
+                    </div>
+                    <div id="card-content" class="hidden"></div>
+                </div>
+            </div>
+            <button id="next-btn" class="btn-primary hidden" onclick="nextPlayer()">Okay, Pass Phone</button>
+        </div>
+
+        <!-- GAME START SCREEN -->
+        <div id="game-start-screen" class="screen">
+            <h1>Game On!</h1>
+            <div class="screen-content">
+                <div id="start-info" class="result-box">
+                    <p style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted);">Who Starts?</p>
+                    <h3 id="first-player" style="font-size: 1.8rem; margin: 0.5rem 0 1rem 0;">Name</h3>
+                    <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 0.5rem 0 1rem 0;"></div>
+                    <p style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted);">Direction</p>
+                    <h3 id="direction" style="color: var(--accent);">Clockwise ↻</h3>
+                </div>
+
+                <div id="imposter-reveal-box" class="result-box hidden" style="border-color: var(--danger);">
+                    <p style="font-size: 0.8rem; text-transform: uppercase; color: var(--danger);">The Imposter(s)</p>
+                    <h3 id="revealed-imposter-name"
+                        style="font-size: 1.8rem; color: var(--danger); margin-top: 0.5rem;">Name</h3>
+                </div>
+            </div>
+
+            <button id="btn-reveal-imposter" class="btn-danger" onclick="revealImposter()">Reveal Imposter</button>
+            <button class="btn-primary" onclick="resetGame()">Play Again</button>
+            <button class="btn-secondary" onclick="showScreen('home-screen')">Home Menu</button>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let players = [];
+        let currentPlayerIndex = 0;
+        let imposterIndices = [];
+        let currentWordData = {};
+        let isRevealed = false;
+
+        let settings = {
+            imposterMode: 'fixed',
+            fixedCount: 1,
+            minImposters: 1,
+            maxImposters: 2
+        };
+
+        const wordData = [
+            { word: "Airplane", category: "Transport" }, { word: "Hospital", category: "Building" },
+            { word: "School", category: "Building" }, { word: "Library", category: "Building" },
+            { word: "Beach", category: "Nature" }, { word: "Cinema", category: "Entertainment" },
+            { word: "Restaurant", category: "Dining" }, { word: "Circus", category: "Entertainment" },
+            { word: "Space Station", category: "Place" }, { word: "Zoo", category: "Place" },
+            { word: "Submarine", category: "Transport" }, { word: "University", category: "Education" },
+            { word: "Bank", category: "Building" }, { word: "Casino", category: "Entertainment" },
+            { word: "Church", category: "Building" }, { word: "Supermarket", category: "Shop" },
+            { word: "Hotel", category: "Building" }, { word: "Museum", category: "Place" },
+            { word: "Train Station", category: "Transport" }, { word: "Pirate Ship", category: "Vehicle" },
+            { word: "Concert", category: "Event" }, { word: "Gym", category: "Place" },
+            { word: "Police Station", category: "Building" }, { word: "Cruise Ship", category: "Transport" },
+            { word: "Farm", category: "Place" }
+        ];
+
+        function addPlayer() {
+            const input = document.getElementById('player-input');
+            const name = input.value.trim();
+            if (name) {
+                players.push(name);
+                renderPlayers();
+                updateBadge();
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function updateBadge() {
+            document.getElementById('player-count-badge').textContent = players.length;
+        }
+
+        document.getElementById('player-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addPlayer();
+        });
+
+        function renderPlayers() {
+            const list = document.getElementById('player-list');
+            const empty = document.getElementById('empty-msg');
+            list.innerHTML = '';
+            empty.style.display = players.length ? 'none' : 'block';
+            players.forEach((p, i) => {
+                const li = document.createElement('li');
+                li.className = 'player-item';
+                li.innerHTML = `<span>${p}</span><button onclick="removePlayer(${i})" style="width:30px;height:30px;padding:0; border-radius:50%; background:rgba(255,255,255,0.1); color:var(--danger)">✕</button>`;
+                list.appendChild(li);
+            });
+        }
+
+        function removePlayer(i) {
+            players.splice(i, 1);
+            renderPlayers();
+            updateBadge();
+        }
+
+        function showScreen(id) {
+            if (id === 'start-game-check') {
+                if (players.length < 3) {
+                    alert("Add at least 3 players!");
+                    return;
+                }
+                startGame();
+                return;
+            }
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(id);
+            if (target) target.classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function setImposterMode(mode) {
+            settings.imposterMode = mode;
+            document.getElementById('mode-fixed').classList.toggle('active', mode === 'fixed');
+            document.getElementById('mode-random').classList.toggle('active', mode === 'random');
+            document.getElementById('fixed-inputs').classList.toggle('hidden', mode !== 'fixed');
+            document.getElementById('random-inputs').classList.toggle('hidden', mode !== 'random');
+        }
+
+        function saveSettings() {
+            settings.fixedCount = parseInt(document.getElementById('fixed-count').value) || 1;
+            settings.minImposters = parseInt(document.getElementById('rand-min').value) || 1;
+            settings.maxImposters = parseInt(document.getElementById('rand-max').value) || 1;
+            showScreen('home-screen');
+        }
+
+        function startGame() {
+            const total = players.length;
+            let count = 1;
+            if (settings.imposterMode === 'fixed') {
+                count = Math.min(settings.fixedCount, total - 1);
+            } else {
+                let min = Math.min(settings.minImposters, total - 1);
+                let max = Math.min(settings.maxImposters, total - 1);
+                count = Math.floor(Math.random() * (max - Math.max(1, min) + 1)) + Math.max(1, min);
+            }
+
+            imposterIndices = [];
+            while (imposterIndices.length < count) {
+                const r = Math.floor(Math.random() * total);
+                if (!imposterIndices.includes(r)) imposterIndices.push(r);
+            }
+
+            currentWordData = wordData[Math.floor(Math.random() * wordData.length)];
+            currentPlayerIndex = 0;
+            updatePassScreen();
+            showScreen('pass-screen');
+        }
+
+        function updatePassScreen() {
+            const p = players[currentPlayerIndex];
+            document.getElementById('next-player-name').textContent = p;
+            document.getElementById('confirm-name').textContent = p;
+        }
+
+        function showReveal() {
+            isRevealed = false;
+            document.getElementById('card-hidden').classList.remove('hidden');
+            document.getElementById('card-content').classList.add('hidden');
+            document.getElementById('reveal-card').style.pointerEvents = 'auto';
+            document.getElementById('next-btn').classList.add('hidden');
+            showScreen('reveal-screen');
+        }
+
+        function revealRole() {
+            if (isRevealed) return;
+            isRevealed = true;
+            const isImp = imposterIndices.includes(currentPlayerIndex);
+            const content = document.getElementById('card-content');
+            const showHint = document.getElementById('hint-toggle').checked;
+
+            document.getElementById('card-hidden').classList.add('hidden');
+            content.classList.remove('hidden');
+            content.classList.add('pop-in');
+
+            if (isImp) {
+                content.innerHTML = `<div><span class="reveal-icon">🤫</span><div class="role-text imposter-text">IMPOSTER</div><p>You don't know the word.</p>${showHint ? `<p style="font-style:italic; color:var(--text-muted)">Hint: ${currentWordData.category}</p>` : ''}<p style="color:white; margin-top:1rem;">Blend in!</p></div>`;
+            } else {
+                content.innerHTML = `<div><span class="reveal-icon">🎯</span><p style="text-transform:uppercase; letter-spacing:1px; color:var(--text-muted)">The Word is</p><div class="word-reveal">${currentWordData.word}</div><div class="role-text safe-text" style="font-size:1.5rem">SAFE</div></div>`;
+            }
+            document.getElementById('reveal-card').style.pointerEvents = 'none';
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function nextPlayer() {
+            currentPlayerIndex++;
+            if (currentPlayerIndex >= players.length) {
+                finishGameSetup();
+            } else {
+                updatePassScreen();
+                showScreen('pass-screen');
+            }
+        }
+
+        function finishGameSetup() {
+            document.getElementById('start-info').classList.remove('hidden');
+            document.getElementById('imposter-reveal-box').classList.add('hidden');
+            document.getElementById('btn-reveal-imposter').classList.remove('hidden');
+            document.getElementById('first-player').textContent = players[Math.floor(Math.random() * players.length)];
+            document.getElementById('direction').textContent = Math.random() > 0.5 ? "Clockwise ↻" : "Counter-Clockwise ↺";
+            showScreen('game-start-screen');
+        }
+
+        function revealImposter() {
+            document.getElementById('start-info').classList.add('hidden');
+            document.getElementById('btn-reveal-imposter').classList.add('hidden');
+            const rev = document.getElementById('imposter-reveal-box');
+            rev.classList.remove('hidden');
+            rev.classList.add('pop-in');
+            document.getElementById('revealed-imposter-name').innerHTML = imposterIndices.map(i => players[i]).join('<br>');
+        }
+
+        function resetGame() {
+            startGame();
+        }
+    </script>
+</body>
+
+</html>
