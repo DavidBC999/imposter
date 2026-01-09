@@ -32,7 +32,6 @@
             box-sizing: border-box;
             font-family: 'Inter', system-ui, sans-serif;
             -webkit-tap-highlight-color: transparent;
-            /* Remove mobile touch blue box */
         }
 
         body {
@@ -42,7 +41,6 @@
             color: var(--text);
             min-height: 100vh;
             min-height: -webkit-fill-available;
-            /* Handle iOS Safari 100vh */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -91,17 +89,16 @@
             }
         }
 
-        /* Typography */
         h1,
         h2 {
             text-align: center;
-            margin-bottom: 1rem;
             letter-spacing: -0.02em;
         }
 
         h1 {
             font-size: 2.5rem;
             background: linear-gradient(to right, #c084fc, #f472b6);
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 800;
@@ -112,6 +109,7 @@
             font-size: 1.5rem;
             color: var(--text);
             margin-top: 0.5rem;
+            margin-bottom: 1rem;
         }
 
         p {
@@ -121,7 +119,6 @@
             line-height: 1.5;
         }
 
-        /* Inputs & Buttons */
         .input-group {
             display: flex;
             gap: 0.5rem;
@@ -137,7 +134,6 @@
             border-radius: 12px;
             color: white;
             font-size: 16px;
-            /* Prevent iOS auto-zoom on focus */
             outline: none;
             transition: border-color 0.2s;
         }
@@ -196,7 +192,6 @@
             margin-bottom: 0;
         }
 
-        /* Menu Buttons */
         .menu-btn {
             justify-content: space-between;
             background: rgba(255, 255, 255, 0.08);
@@ -205,7 +200,6 @@
             margin-bottom: 1rem;
         }
 
-        /* Player List */
         .player-list-container {
             flex-grow: 1;
             overflow-y: auto;
@@ -232,13 +226,13 @@
             animation: fadeIn 0.3s ease;
         }
 
-        /* Settings UI */
         .settings-section {
             background: rgba(0, 0, 0, 0.2);
             border-radius: 12px;
             padding: 1.25rem;
             margin-bottom: 1rem;
             width: 100%;
+            position: relative;
         }
 
         .settings-label {
@@ -274,7 +268,6 @@
             font-weight: 600;
         }
 
-        /* Switch Toggle */
         .switch {
             position: relative;
             display: inline-block;
@@ -320,7 +313,6 @@
             transform: translateX(24px);
         }
 
-        /* Screens */
         .screen {
             display: none;
             flex-direction: column;
@@ -342,7 +334,26 @@
             width: 100%;
         }
 
-        /* Reveal Card */
+        .subtle-bg-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.3s;
+            background: transparent;
+            border: none;
+            width: auto;
+            padding: 2px 5px;
+            margin: 0;
+        }
+
+        .subtle-bg-btn:hover {
+            color: rgba(255, 255, 255, 0.1);
+        }
+
         .reveal-card {
             background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.2) 100%);
             width: 100%;
@@ -379,10 +390,23 @@
         }
 
         .word-reveal {
-            font-size: 2rem;
+            font-size: 1.8rem;
             color: white;
             font-weight: 700;
             margin: 0.5rem 0;
+            line-height: 1.2;
+        }
+
+        .answer-input-box {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+            color: white;
+            font-size: 1rem;
+            outline: none;
         }
 
         .result-box {
@@ -395,7 +419,20 @@
             width: 100%;
         }
 
-        /* Animations */
+        .defense-list {
+            text-align: left;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .defense-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid var(--primary);
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -441,6 +478,23 @@
                 transform: translateY(0px);
             }
         }
+
+        .theme-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            border-radius: 24px;
+        }
     </style>
 </head>
 
@@ -448,7 +502,6 @@
 
     <div class="container">
 
-        <!-- HOME SCREEN -->
         <div id="home-screen" class="screen active">
             <h1 style="margin-top: 1rem;">Imposter</h1>
             <p>Find the spy among us.</p>
@@ -472,7 +525,6 @@
             </div>
         </div>
 
-        <!-- PLAYER SETUP SCREEN -->
         <div id="player-setup-screen" class="screen">
             <h2>Add Players</h2>
             <p>At least 3 players needed.</p>
@@ -493,11 +545,28 @@
             <button class="btn-secondary" onclick="showScreen('home-screen')">Back to Home</button>
         </div>
 
-        <!-- SETTINGS SCREEN -->
         <div id="settings-screen" class="screen">
             <h2>Game Settings</h2>
 
             <div class="screen-content" style="justify-content: flex-start;">
+                <div id="theme-overlay" class="theme-overlay hidden">
+                    <h2 style="margin-bottom: 2rem;">Select Theme</h2>
+                    <button class="btn-secondary" id="theme-btn-original"
+                        onclick="selectTheme('original')">Original</button>
+                    <button class="btn-secondary" id="theme-btn-deep" onclick="selectTheme('deep')">Deep</button>
+                    <button class="btn-secondary" id="theme-btn-spicy" onclick="selectTheme('spicy')">Spicy</button>
+                    <button class="btn-primary" style="margin-top: 1rem;" onclick="closeThemeMenu()">Done</button>
+                </div>
+
+                <div class="settings-section">
+                    <span class="settings-label">Game Mode</span>
+                    <div class="toggle-group">
+                        <div id="mode-word" class="toggle-option active" onclick="setGameMode('word')">Word Game</div>
+                        <div id="mode-question" class="toggle-option" onclick="setGameMode('question')">Question Game
+                        </div>
+                    </div>
+                </div>
+
                 <div class="settings-section">
                     <span class="settings-label">Imposter Count</span>
                     <div class="toggle-group">
@@ -525,7 +594,7 @@
                     </div>
                 </div>
 
-                <div class="settings-section">
+                <div class="settings-section" id="hint-section">
                     <div style="display:flex; align-items:center; justify-content:space-between;">
                         <span style="font-weight: 600;">Show Hint Word</span>
                         <label class="switch">
@@ -535,13 +604,15 @@
                     </div>
                     <p style="text-align: left; font-size: 0.75rem; margin: 0.5rem 0 0 0;">Imposters see the category
                         name.</p>
+                    <button class="subtle-bg-btn" onclick="openThemeMenu()">•••</button>
                 </div>
             </div>
 
+            <p id="current-theme-display"
+                style="font-size: 0.7rem; opacity: 0.3; margin-top: -1rem; margin-bottom: 1rem;">Theme: Original</p>
             <button class="btn-primary" onclick="saveSettings()">Save & Back</button>
         </div>
 
-        <!-- PASS PHONE SCREEN -->
         <div id="pass-screen" class="screen">
             <h2>Pass the Phone</h2>
             <div class="screen-content">
@@ -552,7 +623,6 @@
             <button class="btn-primary" onclick="showReveal()">I am <span id="confirm-name">...</span></button>
         </div>
 
-        <!-- REVEAL SCREEN -->
         <div id="reveal-screen" class="screen">
             <h2>Your Role</h2>
             <div class="screen-content">
@@ -564,10 +634,9 @@
                     <div id="card-content" class="hidden"></div>
                 </div>
             </div>
-            <button id="next-btn" class="btn-primary hidden" onclick="nextPlayer()">Okay, Pass Phone</button>
+            <button id="next-btn" class="btn-primary hidden" onclick="nextPlayer()">Done</button>
         </div>
 
-        <!-- GAME START SCREEN -->
         <div id="game-start-screen" class="screen">
             <h1>Game On!</h1>
             <div class="screen-content">
@@ -579,49 +648,87 @@
                     <h3 id="direction" style="color: var(--accent);">Clockwise ↻</h3>
                 </div>
 
+                <div id="qa-start-box" class="result-box hidden" style="text-align: left;">
+                    <p
+                        style="font-size: 0.75rem; text-transform: uppercase; color: var(--primary); margin-bottom: 0.5rem; text-align: center;">
+                        The Common Question</p>
+                    <h3 id="common-q-display"
+                        style="font-size: 1.1rem; text-align: center; margin-bottom: 1rem; color: white;">...</h3>
+                    <div class="defense-list" id="start-answer-list"></div>
+                </div>
+
                 <div id="imposter-reveal-box" class="result-box hidden" style="border-color: var(--danger);">
-                    <p style="font-size: 0.8rem; text-transform: uppercase; color: var(--danger);">The Imposter(s)</p>
-                    <h3 id="revealed-imposter-name"
-                        style="font-size: 1.8rem; color: var(--danger); margin-top: 0.5rem;">Name</h3>
+                    <p style="font-size: 0.8rem; text-transform: uppercase; color: var(--danger);">Round Stats</p>
+                    <div id="revealed-imposter-name" style="margin-top: 1rem;"></div>
                 </div>
             </div>
 
-            <button id="btn-reveal-imposter" class="btn-danger" onclick="revealImposter()">Reveal Imposter</button>
+            <button id="btn-reveal-imposter" class="btn-danger" onclick="revealImposter()">Reveal Results</button>
             <button class="btn-primary" onclick="resetGame()">Play Again</button>
             <button class="btn-secondary" onclick="showScreen('home-screen')">Home Menu</button>
         </div>
     </div>
 
     <script>
-        // State
         let players = [];
+        let playerAnswers = [];
         let currentPlayerIndex = 0;
         let imposterIndices = [];
-        let currentWordData = {};
+        let currentWordData = {}; // Stores {word, category} or {safeQ, imposterQ, category}
         let isRevealed = false;
 
         let settings = {
+            gameMode: 'word',
             imposterMode: 'fixed',
             fixedCount: 1,
             minImposters: 1,
-            maxImposters: 2
+            maxImposters: 2,
+            currentTheme: 'original'
         };
 
-        const wordData = [
-            { word: "Airplane", category: "Transport" }, { word: "Hospital", category: "Building" },
-            { word: "School", category: "Building" }, { word: "Library", category: "Building" },
-            { word: "Beach", category: "Nature" }, { word: "Cinema", category: "Entertainment" },
-            { word: "Restaurant", category: "Dining" }, { word: "Circus", category: "Entertainment" },
-            { word: "Space Station", category: "Place" }, { word: "Zoo", category: "Place" },
-            { word: "Submarine", category: "Transport" }, { word: "University", category: "Education" },
-            { word: "Bank", category: "Building" }, { word: "Casino", category: "Entertainment" },
-            { word: "Church", category: "Building" }, { word: "Supermarket", category: "Shop" },
-            { word: "Hotel", category: "Building" }, { word: "Museum", category: "Place" },
-            { word: "Train Station", category: "Transport" }, { word: "Pirate Ship", category: "Vehicle" },
-            { word: "Concert", category: "Event" }, { word: "Gym", category: "Place" },
-            { word: "Police Station", category: "Building" }, { word: "Cruise Ship", category: "Transport" },
-            { word: "Farm", category: "Place" }
-        ];
+        const themes = {
+            original: [
+                { word: "Sushi", category: "Food" }, { word: "Pizza", category: "Food" }, { word: "Burger", category: "Food" }, { word: "Taco", category: "Food" }, { word: "Pasta", category: "Food" }, { word: "Salad", category: "Food" }, { word: "Pancake", category: "Food" }, { word: "Waffle", category: "Food" }, { word: "Steak", category: "Food" }, { word: "Ice Cream", category: "Food" }, { word: "Donut", category: "Food" }, { word: "Ramen", category: "Food" }, { word: "Curry", category: "Food" },
+                { word: "Doctor", category: "Job" }, { word: "Firefighter", category: "Job" }, { word: "Pilot", category: "Job" }, { word: "Chef", category: "Job" }, { word: "Astronaut", category: "Job" }, { word: "Lawyer", category: "Job" }, { word: "Teacher", category: "Job" }, { word: "Artist", category: "Job" }, { word: "Musician", category: "Job" }, { word: "Engineer", category: "Job" }, { word: "Farmer", category: "Job" }, { word: "Plumber", category: "Job" }, { word: "Scientist", category: "Job" },
+                { word: "Gardening", category: "Hobby" }, { word: "Chess", category: "Hobby" }, { word: "Soccer", category: "Hobby" }, { word: "Basketball", category: "Hobby" }, { word: "Gaming", category: "Hobby" }, { word: "Cooking", category: "Hobby" }, { word: "Painting", category: "Hobby" }, { word: "Yoga", category: "Hobby" }, { word: "Hiking", category: "Hobby" }, { word: "Photography", category: "Hobby" }, { word: "Dancing", category: "Hobby" }, { word: "Singing", category: "Hobby" }, { word: "Surfing", category: "Hobby" }
+            ],
+            deep: [
+                { word: "Your biggest regret", category: "Deep" }, { word: "The one who got away", category: "Deep" }, { word: "Your biggest fear", category: "Deep" }, { word: "A hidden talent", category: "Deep" }, { word: "The last time you cried", category: "Deep" }, { word: "A dream you haven't told anyone", category: "Deep" }
+            ],
+            spicy: [
+                { word: "Secret desire", category: "Spicy" }, { word: "Dirty talk", category: "Spicy" }, { word: "Lingerie", category: "Spicy" }, { word: "French kiss", category: "Spicy" }
+            ]
+        };
+
+        const questionThemes = {
+            original: [
+                { safe: "What is the best type of pizza?", imposter: "What is the worst type of pizza?", category: "Food" },
+                { safe: "Which season is the most beautiful?", imposter: "Which season is the most annoying?", category: "Nature" },
+                { safe: "What is the most useful invention?", imposter: "What is the most useless invention?", category: "General" },
+                { safe: "Who is the best superhero?", imposter: "Who is the worst superhero?", category: "Movies" },
+                { safe: "What is your favorite animal?", imposter: "What is the scariest animal?", category: "Animals" },
+                { safe: "What is the best school subject?", imposter: "What is the hardest school subject?", category: "Education" },
+                { safe: "Which holiday is the best?", imposter: "Which holiday is the most stressful?", category: "Life" },
+                { safe: "What is the coolest car?", imposter: "What is the most unreliable car?", category: "Transport" }
+            ],
+            deep: [
+                { safe: "What is your proudest moment?", imposter: "What is your most embarrassing moment?", category: "Emotions" },
+                { safe: "What would you do if you won a billion dollars?", imposter: "What would you do if you lost all your money?", category: "Life" },
+                { safe: "What is the meaning of life?", imposter: "What is the biggest myth people believe?", category: "Philosophy" },
+                { safe: "If you could change one thing about yourself, what would it be?", imposter: "What is something you never want to change about yourself?", category: "Self" },
+                { safe: "What is the best piece of advice you've ever received?", imposter: "What is the worst advice you've ever received?", category: "Wisdom" },
+                { safe: "What do you want to be remembered for?", imposter: "What is a mistake you hope everyone forgets?", category: "Legacy" },
+                { safe: "Who has influenced you the most in life?", imposter: "Who is someone you never want to be like?", category: "Influence" }
+            ],
+            spicy: [
+                { safe: "What is your favorite place to be kissed?", imposter: "What is the weirdest place you've been kissed?", category: "Freaky" },
+                { safe: "What is a major turn-on for you?", imposter: "What is a major turn-off for you?", category: "Freaky" },
+                { safe: "What is the best part of a first date?", imposter: "What is the scariest part of a first date?", category: "Romance" },
+                { safe: "What is your favorite romantic gesture?", imposter: "What is the most awkward romantic gesture?", category: "Romance" },
+                { safe: "What is the most attractive quality in a partner?", imposter: "What is the biggest dealbreaker in a partner?", category: "Attraction" },
+                { safe: "Where is the most romantic place for a getaway?", imposter: "Where is the least romantic place for a getaway?", category: "Travel" }
+            ]
+        };
 
         function addPlayer() {
             const input = document.getElementById('player-input');
@@ -635,13 +742,7 @@
             }
         }
 
-        function updateBadge() {
-            document.getElementById('player-count-badge').textContent = players.length;
-        }
-
-        document.getElementById('player-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addPlayer();
-        });
+        function updateBadge() { document.getElementById('player-count-badge').textContent = players.length; }
 
         function renderPlayers() {
             const list = document.getElementById('player-list');
@@ -664,10 +765,7 @@
 
         function showScreen(id) {
             if (id === 'start-game-check') {
-                if (players.length < 3) {
-                    alert("Add at least 3 players!");
-                    return;
-                }
+                if (players.length < 3) { alert("Add at least 3 players!"); return; }
                 startGame();
                 return;
             }
@@ -675,6 +773,23 @@
             const target = document.getElementById(id);
             if (target) target.classList.add('active');
             window.scrollTo(0, 0);
+        }
+
+        function setGameMode(mode) {
+            settings.gameMode = mode;
+            document.getElementById('mode-word').classList.toggle('active', mode === 'word');
+            document.getElementById('mode-question').classList.toggle('active', mode === 'question');
+
+            const hintSection = document.getElementById('hint-section');
+            const hintToggle = document.getElementById('hint-toggle');
+            if (mode === 'question') {
+                hintSection.style.opacity = '0.3';
+                hintSection.style.pointerEvents = 'none';
+                hintToggle.checked = false;
+            } else {
+                hintSection.style.opacity = '1';
+                hintSection.style.pointerEvents = 'auto';
+            }
         }
 
         function setImposterMode(mode) {
@@ -692,12 +807,29 @@
             showScreen('home-screen');
         }
 
+        function selectTheme(theme) {
+            settings.currentTheme = theme;
+            document.getElementById('current-theme-display').textContent = "Theme: " + theme.charAt(0).toUpperCase() + theme.slice(1);
+            updateThemeButtons();
+        }
+
+        function updateThemeButtons() {
+            ['original', 'deep', 'spicy'].forEach(t => {
+                const btn = document.getElementById('theme-btn-' + t);
+                btn.style.borderColor = (settings.currentTheme === t) ? 'var(--primary)' : 'transparent';
+                btn.style.background = (settings.currentTheme === t) ? 'rgba(139, 92, 246, 0.2)' : 'rgba(255, 255, 255, 0.1)';
+            });
+        }
+
+        function openThemeMenu() { document.getElementById('theme-overlay').classList.remove('hidden'); updateThemeButtons(); }
+        function closeThemeMenu() { document.getElementById('theme-overlay').classList.add('hidden'); }
+
         function startGame() {
             const total = players.length;
+            playerAnswers = new Array(total).fill('');
             let count = 1;
-            if (settings.imposterMode === 'fixed') {
-                count = Math.min(settings.fixedCount, total - 1);
-            } else {
+            if (settings.imposterMode === 'fixed') { count = Math.min(settings.fixedCount, total - 1); }
+            else {
                 let min = Math.min(settings.minImposters, total - 1);
                 let max = Math.min(settings.maxImposters, total - 1);
                 count = Math.floor(Math.random() * (max - Math.max(1, min) + 1)) + Math.max(1, min);
@@ -709,7 +841,19 @@
                 if (!imposterIndices.includes(r)) imposterIndices.push(r);
             }
 
-            currentWordData = wordData[Math.floor(Math.random() * wordData.length)];
+            if (settings.gameMode === 'word') {
+                if (settings.currentTheme !== 'spicy' && Math.random() < 0.20) {
+                    const randPlayer = players[Math.floor(Math.random() * players.length)];
+                    currentWordData = { word: randPlayer, category: "Someone here" };
+                } else {
+                    const bank = themes[settings.currentTheme];
+                    currentWordData = bank[Math.floor(Math.random() * bank.length)];
+                }
+            } else {
+                const bank = questionThemes[settings.currentTheme];
+                currentWordData = bank[Math.floor(Math.random() * bank.length)];
+            }
+
             currentPlayerIndex = 0;
             updatePassScreen();
             showScreen('pass-screen');
@@ -741,29 +885,56 @@
             content.classList.remove('hidden');
             content.classList.add('pop-in');
 
-            if (isImp) {
-                content.innerHTML = `<div><span class="reveal-icon">🤫</span><div class="role-text imposter-text">IMPOSTER</div><p>You don't know the word.</p>${showHint ? `<p style="font-style:italic; color:var(--text-muted)">Hint: ${currentWordData.category}</p>` : ''}<p style="color:white; margin-top:1rem;">Blend in!</p></div>`;
+            if (settings.gameMode === 'word') {
+                if (isImp) {
+                    content.innerHTML = `<div><span class="reveal-icon">🤫</span><div class="role-text imposter-text">IMPOSTER</div><p>You don't know the word.</p>${showHint ? `<p style="font-style:italic; color:var(--text-muted)">Hint: ${currentWordData.category}</p>` : ''}</div>`;
+                } else {
+                    content.innerHTML = `<div><span class="reveal-icon">🎯</span><p style="text-transform:uppercase; letter-spacing:1px; color:var(--text-muted)">The Word is</p><div class="word-reveal">${currentWordData.word}</div><div class="role-text safe-text" style="font-size:1.5rem">SAFE</div></div>`;
+                }
             } else {
-                content.innerHTML = `<div><span class="reveal-icon">🎯</span><p style="text-transform:uppercase; letter-spacing:1px; color:var(--text-muted)">The Word is</p><div class="word-reveal">${currentWordData.word}</div><div class="role-text safe-text" style="font-size:1.5rem">SAFE</div></div>`;
+                const prompt = isImp ? currentWordData.imposter : currentWordData.safe;
+                content.innerHTML = `<div><p style="text-transform:uppercase; letter-spacing:1px; color:var(--text-muted)">Your Question:</p><div class="word-reveal" style="font-size:1.2rem; margin:1rem 0;">${prompt}</div><input type="text" id="answer-input" class="answer-input-box" placeholder="Type your answer here..." autocomplete="off"></div>`;
+                setTimeout(() => document.getElementById('answer-input').focus(), 100);
             }
+
             document.getElementById('reveal-card').style.pointerEvents = 'none';
             document.getElementById('next-btn').classList.remove('hidden');
         }
 
         function nextPlayer() {
-            currentPlayerIndex++;
-            if (currentPlayerIndex >= players.length) {
-                finishGameSetup();
-            } else {
-                updatePassScreen();
-                showScreen('pass-screen');
+            if (settings.gameMode === 'question') {
+                const ans = document.getElementById('answer-input').value.trim();
+                playerAnswers[currentPlayerIndex] = ans || "(No Answer)";
             }
+
+            currentPlayerIndex++;
+            if (currentPlayerIndex >= players.length) { finishGameSetup(); }
+            else { updatePassScreen(); showScreen('pass-screen'); }
         }
 
         function finishGameSetup() {
             document.getElementById('start-info').classList.remove('hidden');
             document.getElementById('imposter-reveal-box').classList.add('hidden');
             document.getElementById('btn-reveal-imposter').classList.remove('hidden');
+
+            const qaBox = document.getElementById('qa-start-box');
+            if (settings.gameMode === 'question') {
+                qaBox.classList.remove('hidden');
+                document.getElementById('common-q-display').textContent = `"${currentWordData.safe}"`;
+
+                let ansHtml = "";
+                players.forEach((p, i) => {
+                    ansHtml += `
+                        <div class="defense-item" style="border-color: var(--glass-border)">
+                            <div style="font-size:0.7rem; color:var(--text-muted)">${p} answered:</div>
+                            <div style="color:white; font-weight:600;">${playerAnswers[i]}</div>
+                        </div>`;
+                });
+                document.getElementById('start-answer-list').innerHTML = ansHtml;
+            } else {
+                qaBox.classList.add('hidden');
+            }
+
             document.getElementById('first-player').textContent = players[Math.floor(Math.random() * players.length)];
             document.getElementById('direction').textContent = Math.random() > 0.5 ? "Clockwise ↻" : "Counter-Clockwise ↺";
             showScreen('game-start-screen');
@@ -775,12 +946,39 @@
             const rev = document.getElementById('imposter-reveal-box');
             rev.classList.remove('hidden');
             rev.classList.add('pop-in');
-            document.getElementById('revealed-imposter-name').innerHTML = imposterIndices.map(i => players[i]).join('<br>');
+
+            const impNames = imposterIndices.map(i => players[i]);
+            let html = "";
+
+            if (settings.gameMode === 'word') {
+                html = `<h3 style="color:var(--danger); font-size:1.8rem;">${impNames.join('<br>')}</h3>
+                        <div style="height: 1px; background: rgba(239, 68, 68, 0.2); margin: 1rem 0;"></div>
+                        <p style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted);">The Word Was</p>
+                        <span style="color: white; font-size: 1.4rem;">${currentWordData.word}</span>`;
+            } else {
+                html = `<p style="font-size: 0.75rem; text-transform: uppercase; color: var(--success); margin-bottom: 0.5rem;">Safe Question</p>
+                        <div class="word-reveal" style="font-size:1.1rem; color:var(--success); margin-bottom:1rem;">"${currentWordData.safe}"</div>
+                        <p style="font-size: 0.75rem; text-transform: uppercase; color: var(--danger); margin-bottom: 0.5rem;">Imposter Question</p>
+                        <div class="word-reveal" style="font-size:1.1rem; color:var(--danger); margin-bottom:1rem;">"${currentWordData.imposter}"</div>
+                        <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 1rem 0;"></div>
+                        <p style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted);">The Imposter was: <span style="color:var(--danger)">${impNames.join(', ')}</span></p>
+                        <div class="defense-list">`;
+
+                players.forEach((p, i) => {
+                    const isImp = imposterIndices.includes(i);
+                    html += `
+                        <div class="defense-item" style="border-color: ${isImp ? 'var(--danger)' : 'var(--primary)'}">
+                            <div style="font-size:0.7rem; color:var(--text-muted)">${p} answered:</div>
+                            <div style="color:white; font-weight:600;">${playerAnswers[i]}</div>
+                        </div>`;
+                });
+                html += `</div>`;
+            }
+
+            document.getElementById('revealed-imposter-name').innerHTML = html;
         }
 
-        function resetGame() {
-            startGame();
-        }
+        function resetGame() { startGame(); }
     </script>
 </body>
 
